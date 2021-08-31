@@ -100,6 +100,26 @@ let tests: [Test] = [
     Test(numberString: "47473204", countryCode: "NO", parsed: true),
     Test(numberString: "47473204", countryCode: nil, parsed: false),
 
+    // LT
+    Test(numberString: "01137052367019", countryCode: "LT", parsed: false),
+    Test(numberString: "01137052367019", countryCode: "NO", parsed: false),
+    Test(numberString: "01137052367019", countryCode: nil, parsed: false),
+    Test(numberString: "0037052367019", countryCode: "LT", parsed: true),
+    Test(numberString: "0037052367019", countryCode: "NO", parsed: true),
+    Test(numberString: "0037052367019", countryCode: nil, parsed: true),
+    Test(numberString: "37052367019", countryCode: "LT", parsed: true),
+    Test(numberString: "37052367019", countryCode: "NO", parsed: true),
+    Test(numberString: "37052367019", countryCode: nil, parsed: true),
+    Test(numberString: "+37052367019", countryCode: "LT", parsed: true),
+    Test(numberString: "+37052367019", countryCode: "NO", parsed: true),
+    Test(numberString: "+37052367019", countryCode: nil, parsed: true),
+    Test(numberString: "852367019", countryCode: "LT", parsed: true),
+    Test(numberString: "852367019", countryCode: "NO", parsed: false),
+    Test(numberString: "852367019", countryCode: nil, parsed: false),
+    Test(numberString: "52367019", countryCode: "LT", parsed: true),
+    Test(numberString: "52367019", countryCode: "NO", parsed: false),
+    Test(numberString: "52367019", countryCode: nil, parsed: false),
+
     // PL
     Test(numberString: "01148690300400", countryCode: "PL", parsed: false),
     Test(numberString: "01148690300400", countryCode: nil, parsed: false), // parsed correctly, why?
@@ -115,38 +135,28 @@ let tests: [Test] = [
 
 var passed = 0
 var all = 0
-for (index, test) in tests.enumerated() {
-
-    guard test.countryCode == nil else {
-        continue
-    }
-
-    print("START \(index), test = \(test)")
+for (_, test) in tests.enumerated() {
 
     let phoneNumberKit = PhoneNumberKit()
-    var parsed = false
-    if let phoneNumber = phoneNumberKit.parseIfPossible(test.numberString, withRegion: test.countryCode) {
+    let phoneNumber = phoneNumberKit.parseIfPossible(test.numberString, withRegion: test.countryCode)
 
-        print("Phone number: \(phoneNumber)")
-        if let country = phoneNumberKit.getRegionCode(of: phoneNumber) {
-            print("Country: \(country)")
-        }
-        let formatted = phoneNumberKit.format(phoneNumber, toType: .e164, withPrefix: true)
-        print("Formatted: \(formatted)")
-        parsed = true
-
-    } else {
-
-        print("Invalid number")
+    var formatted = ""
+    var national: String?
+    var inter: String?
+    var country = ""
+    if let phoneNumber = phoneNumber {
+        country = phoneNumberKit.getRegionCode(of: phoneNumber) ?? ""
+        formatted = phoneNumberKit.format(phoneNumber, toType: .e164, withPrefix: true)
+        national = phoneNumberKit.format(phoneNumber, toType: .national, withPrefix: false)
+        inter = phoneNumberKit.format(phoneNumber, toType: .international, withPrefix: true)
     }
 
-    print("END \(index), passed = \(test.parsed == parsed)")
-    print("")
+    let parsed = phoneNumber != nil
+    let testPassed = test.parsed == parsed
 
-    if test.parsed == parsed {
-        passed += 1
-    }
+    print("\(testPassed ? "✅" : "❌") \(test.numberString) ---(\(test.countryCode ?? "nil"))---> \(phoneNumber != nil ? formatted + " | detected country code = \(country)" : "not parsed") | national = \(national ?? test.numberString) | international = \(inter ?? test.numberString)")
 
+    passed += testPassed ? 1 : 0
     all += 1
 }
 

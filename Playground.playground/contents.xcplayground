@@ -3,5 +3,7 @@
     <pages>
         <page name='MyViewController'/>
         <page name='PhoneNumberKit+CountryCode'/>
+        <page name='Substrings'/>
+        <page name='TimeZones'/>
     </pages>
 </playground>
