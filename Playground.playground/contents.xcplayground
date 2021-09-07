@@ -3,6 +3,7 @@
     <pages>
         <page name='MyViewController'/>
         <page name='PhoneNumberKit+CountryCode'/>
+        <page name='ReloadCellNoScrolling'/>
         <page name='Substrings'/>
         <page name='TimeZones'/>
     </pages>
